@@ -1,0 +1,132 @@
+from math import floor
+import plotly.express as px
+from preproccessing import DF
+import pandas as pd
+
+def filter_data(age_group:list = None, med_cond:list = None, area:list = None):
+    """
+    Filteres data according to user wants:
+    by ORing what's in the lists
+    n.d. if a choice is none or empty the filter ignores it and returns all possible values
+    """
+    filtered_df = DF
+    if age_group and len(age_group)!=0:
+        filtered_df = filtered_df[DF.Age_group.isin(age_group)]
+    if med_cond and len(med_cond)!=0:
+        # filtered_df = filtered_df[
+        #     ((DF.Hipertenstion) if "Hipertenstion" in med_cond else False) |
+        #     ((DF.Diabetes) if "Diabetes" in med_cond else False) |
+        #     ((DF.Alcholism) if "Alcholism" in med_cond else False) |
+        #     ((DF.Handcap) if "Handcap" in med_cond else False)
+        #     ]
+        mask = pd.Series(False, index=filtered_df.index)
+        for cond in med_cond:
+            mask |= filtered_df[cond]
+        filtered_df = filtered_df[mask]
+    if area and len(area)!=0:
+        filtered_df = filtered_df[filtered_df.Neighbourhood.isin(area)]
+    return filtered_df
+
+def no_show_card(age_group:list = None, med_cond:list=None, area:list=None):
+    filtered_df = filter_data(age_group, med_cond, area)
+
+    num_absence = filtered_df[ ~ filtered_df.Showed].shape[0]
+    return num_absence, num_absence*100 / filtered_df.shape[0]
+
+def recived_sms_card(age_group:list = None, med_cond:list=None, area:list=None):
+    filtered_df = filter_data(age_group, med_cond, area)
+
+    filtered_df = filtered_df[ ~ filtered_df.Showed]
+    num_SMS = filtered_df[filtered_df.SMS_received].shape[0]
+    return num_SMS*100 / filtered_df.shape[0]
+
+def avg_appoint_delay(age_group:list=None, med_cond:list = None, area:list = None):
+    filtered_df = filter_data(age_group, med_cond, area)
+    return floor(filtered_df.Delay.median())
+
+def age_gender_dist():
+    age_group = DF[~DF.Showed].groupby(["Age_group", "Gender"]).size()
+    age_group = age_group.reset_index(name = "Count")
+    age_group['total'] = age_group.groupby("Age_group")["Count"].transform("sum")
+    age_group.sort_values("total", ascending = False, inplace = True)
+
+    # print(age_group.columns)
+    g = px.bar(age_group,  "Age_group", "Count", color = "Gender",
+               color_discrete_map={
+                   "M": "lightblue",
+                   "F": "pink"
+               })
+
+    g.update_layout(dict(
+        title="No-Shows Distribution by Age Group & Gender",
+        xaxis_title="Age Groups",
+        yaxis_title="Count", paper_bgcolor="rgba(0,0,0,0)", plot_bgcolor="rgba(0,0,0,0)"
+    ))
+
+    return g
+
+def appoint_delay_hist(age_group:list, med_cond:list, area:list):
+    filtered_df = filter_data(age_group, med_cond, area)
+    filtered_df = filtered_df[~ filtered_df.Showed]
+    filtered_df = filtered_df[filtered_df.Delay>=0]
+    g = px.histogram(filtered_df, x= "Delay", nbins=20, color_discrete_sequence=["#009e73"])
+
+    g.update_layout(dict(
+        title="Delay by Days Between Schedule and Appointment",
+        xaxis_title="Delay (Days)",
+        yaxis_title="Count", paper_bgcolor="rgba(0,0,0,0)", plot_bgcolor="rgba(0,0,0,0)"
+    ))
+    g.update_xaxes(nticks=20, tickangle = -30)
+    return g
+
+def new_lead_donut(age_group:list = None, med_cond:list = None, area:list = None):
+    filtered_df = filter_data(age_group, med_cond, area)
+    filtered_df = filtered_df[~ filtered_df.Showed]
+    cat = filtered_df.Lead.value_counts().reset_index(name = "Count")
+    cat.Lead = cat.Lead.apply(lambda x: "Lead Customer" if x else "New Customer")
+
+    g= px.pie(cat, "Lead", "Count", hole=0.3, color_discrete_sequence=["#009e73"])
+    g.update_layout(dict(
+        title="New VS Lead Customers No-Shows",paper_bgcolor="rgba(0,0,0,0)", plot_bgcolor="rgba(0,0,0,0)"
+    ))
+    g.update_traces(textinfo="label+percent")
+
+    return g
+
+def medical_cond_donut(age_group:list = None, area:list = None):
+    filtered_data = filter_data(age_group, area =  area)
+    cat = filtered_data[filtered_data.Hipertension].Hipertension.value_counts().reset_index(name="Count")
+
+    cat.Hipertension= cat.Hipertension.astype(str)
+    cat.iloc[0, 0] = "Hipertension"
+    cat.rename(columns={"Hipertension": "cond"}, inplace=True)
+
+    cat.loc[1] = dict(cond="Diabetes", Count=filtered_data[filtered_data.Diabetes].Diabetes.value_counts().get(True, 0))
+    cat.loc[2] = dict(cond="Alcoholism", Count=filtered_data[filtered_data.Alcoholism].Alcoholism.value_counts().get(True, 0))
+    cat.loc[3] = dict(cond="Handcap", Count=filtered_data[filtered_data.Handcap].Handcap.value_counts().get(True, 0))
+
+    g= px.pie(cat, "cond", "Count", hole=0.3, color_discrete_sequence=["#009e73"])
+    g.update_layout(dict(
+        title="No-shows by Medical Condition", paper_bgcolor="rgba(0,0,0,0)", plot_bgcolor="rgba(0,0,0,0)"
+    ))
+    g.update_traces(textinfo="label+percent")
+
+    return g
+
+def appoint_gantt(age_group:list = None, med_cond:list = None, area:list = None):
+    filtered_data = filter_data(age_group, med_cond, area)
+    filtered_data = filtered_data[(~filtered_data.Showed ) & (filtered_data.Delay>0)]
+    df_sorted_first20 = (
+        filtered_data.sort_values(["Delay", "AppointmentDay"], ascending=[True, False])
+        .groupby("Delay", group_keys=False)
+        .head(40)
+    )
+
+    g = px.timeline(df_sorted_first20, x_start="ScheduledDay", x_end="AppointmentDay", y="Delay", color_discrete_sequence=["#009e73"])
+    g.update_yaxes(autorange="reversed")
+    g.update_layout(dict(
+        title="Filtered No-Shows Timeline (Recent 40 in Delay)",
+        xaxis_title="Time",
+        yaxis_title="Delay", paper_bgcolor="rgba(0,0,0,0)", plot_bgcolor="rgba(0,0,0,0)"
+    ))
+    return g

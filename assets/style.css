@@ -1,0 +1,94 @@
+html, body{
+    background-color: #627899;
+}
+
+.container {
+    margin-bottom: 5px;
+}
+
+.card {
+    margin: 2%;
+    margin-top: 10px;
+    background: #dbf2ff;
+    width: 100%;
+    /* height: 165px; */
+    box-shadow: none /*0 2px 3px 0px rgba(0, 0, 0, 0.25)*/;
+    border-radius: 8px;
+    transition: .2s all;
+    cursor: pointer;
+    align-items: center;
+    text-align: center;
+    font-size: 14px;
+    padding-top: 2px;
+}
+
+
+.chart-card {
+    /*margin: 2%;*/
+    /*margin-top: 10px;*/
+    /*margin-right: 5px;*/
+    margin-inside: 10px;
+    background: #dbf2ff;
+    /*width: 100%;*/
+    /* height: 165px; */
+    box-shadow: 0 2px 3px 0px rgba(0, 0, 0, 0.25);
+    border-radius: 20px;
+    /*transition: .2s all;*/
+    /*cursor: pointer;*/
+    /*align-items: center;*/
+    /*text-align: center;*/
+    font-size: 14px;
+    padding-top: 2px;
+}
+
+.card > span {
+    display: block;
+    margin: auto;
+    max-width: 100%;
+}
+
+.container:hover .card {
+    filter: blur(3px);
+    opacity: .5;
+    transform: scale(.98);
+    box-shadow: none;
+}
+
+.container:hover .card:hover {
+transform: scale(1);
+filter: blur(0px);
+opacity: 1;
+box-shadow: 0 8px 20px 0px rgba(0, 0, 0, 0.125);
+background: #dbf2ff;
+/*color: white;*/
+}
+
+#controllers{
+    height: 25vh;
+}
+#age-gender-dist{
+    height: 25vh;
+    padding: 0;
+}
+#new-or-lead{
+    height: 35vh;
+    padding: 0;
+}
+#appoint-delay{
+    height: 35vh;
+    padding: 0;
+}
+#geo-map{
+    height: 40vh;
+    padding: 0;
+}
+#medical_condition{
+    height:40vh;
+    padding: 0;
+}
+#appoint-gantt{
+    height: 75vh;
+    width: 100%;
+    padding: 0;
+    margin: 0;
+}
