@@ -15,7 +15,7 @@ def get_main_content():
 
     main_content = html.Div([
         html.Div([
-            html.H3("Medical No-Shows Analysis Dashboard",  className="text-left fw-bold text-nowrap", style={"color": "#e0ebde"}),
+            html.H3("Medical No-Shows Analysis in Vitória - State of Espírito Santo",  className="text-left fw-bold text-nowrap", style={"color": "#e0ebde"}),
             html.Div([
                 html.Div([
                     html.Div([

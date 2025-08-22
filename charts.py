@@ -4,6 +4,10 @@ from preproccessing import DF
 import pandas as pd
 from urllib.request import urlopen
 import json
+with urlopen(
+        'https://gis.vitoria.es.gov.br/arcgis/rest/services/DevMapaBaseImobiliario/MapServer/8/query?where=codBairroIBGE%20LIKE%20%273205309%%27&outFields=*&outSR=4326&f=geojson') as response:
+    neighbours = json.load(response)
+# Filtering with id 273205309% of Vitória
 
 def filter_data(age_group:list = None, med_cond:list = None, area:list = None):
     """
@@ -114,7 +118,7 @@ def medical_cond_donut(age_group:list = None, area:list = None):
     conditions_count[3] = dict(cond="Handcap", Count=filtered_data.Handcap.sum())
 
     conditions_count = pd.DataFrame(conditions_count)
-    g= px.pie(conditions_count, "cond", "Count", hole=0.3, color_discrete_sequence=["#009e73"])
+    g= px.pie(conditions_count, "cond", "Count", hole=0.3, color_discrete_sequence=px.colors.sequential.Aggrnyl)
     g.update_layout(dict(
         title="No-shows by Medical Condition", paper_bgcolor="rgba(0,0,0,0)", plot_bgcolor="rgba(0,0,0,0)"
     ))
@@ -131,11 +135,42 @@ def appoint_gantt(age_group:list = None, med_cond:list = None, area:list = None)
         .head(40)
     )
 
-    g = px.timeline(df_sorted_first20, x_start="ScheduledDay", x_end="AppointmentDay", y="Delay", color_discrete_sequence=["#009e73"])
+    g = px.timeline(df_sorted_first20, x_start="ScheduledDay", x_end="AppointmentDay", y="Delay", color = "Age_group", color_discrete_sequence=px.colors.sequential.Aggrnyl)
     g.update_yaxes(autorange="reversed")
     g.update_layout(dict(
-        title="Filtered No-Shows Timeline (Recent 40 in Delay)",
+        title="Filtered No-Shows Timeline (Recent 40 in each Delay)",
         xaxis_title="Time",
-        yaxis_title="Delay", paper_bgcolor="rgba(0,0,0,0)", plot_bgcolor="rgba(0,0,0,0)"
+        yaxis_title="Delay in Days", paper_bgcolor="rgba(0,0,0,0)", plot_bgcolor="rgba(0,0,0,0)"
+    ))
+    return g
+
+def geo_map(age_group:list = None, med_cond:list = None):
+    filtered_data = filter_data(age_group, med_cond)
+
+    no_show_stats = (
+        filtered_data
+        .groupby("Neighbourhood")
+        .agg(
+            total=("Showed", "count"),
+            showed=("Showed", "sum")
+        )
+    )
+    no_show_stats["showed"] = no_show_stats["showed"] *100 / no_show_stats["total"]
+    no_show_stats["not_showed"] = 100 - no_show_stats["showed"]
+    no_show_stats.reset_index(inplace=True)
+
+    g = px.choropleth_map(no_show_stats, geojson=neighbours, locations='Neighbourhood', color='not_showed',
+                            map_style="carto-positron",
+                            zoom=10.8, center = {"lat": -20.2779197, "lon": -40.3011542},
+                            range_color=(0, 100),
+                            opacity=0.8,
+                            color_continuous_scale= 'Aggrnyl',
+                            featureidkey="properties.nome",
+                            labels={'not_showed': 'No-Shows Perc'}
+                            )
+    g.update_layout(dict(
+        margin={"r": 0, "t": 0, "l": 0, "b": 0},
+        title="No-Shows Percentage by Neighbourhood",
+        paper_bgcolor="rgba(0,0,0,0)", plot_bgcolor="rgba(0,0,0,0)"
     ))
     return g

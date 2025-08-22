@@ -72,3 +72,10 @@ def register_callbacks(app):
     ])
     def update_gantt(age_group: list, med_cond: list, area: list):
         return charts.appoint_gantt(age_group, med_cond, area)
+
+    @app.callback(Output("geo-map", "figure"), [
+        Input("age-group-filter", "value"),
+        Input("medical-cond-filter", "value"),
+    ])
+    def update_map(age_group: list, med_cond: list):
+        return charts.geo_map(age_group, med_cond)
