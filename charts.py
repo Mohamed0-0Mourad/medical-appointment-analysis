@@ -2,6 +2,8 @@ from math import floor
 import plotly.express as px
 from preproccessing import DF
 import pandas as pd
+from urllib.request import urlopen
+import json
 
 def filter_data(age_group:list = None, med_cond:list = None, area:list = None):
     """
@@ -27,22 +29,31 @@ def filter_data(age_group:list = None, med_cond:list = None, area:list = None):
         filtered_df = filtered_df[filtered_df.Neighbourhood.isin(area)]
     return filtered_df
 
-def no_show_card(age_group:list = None, med_cond:list=None, area:list=None):
+def no_show_card(age_group:list = None, med_cond:list=None, area:list=None, format:str="Value"):
     filtered_df = filter_data(age_group, med_cond, area)
 
-    num_absence = filtered_df[ ~ filtered_df.Showed].shape[0]
-    return num_absence, num_absence*100 / filtered_df.shape[0]
+    num_absence = filtered_df.shape[0] - filtered_df.Showed.sum()
+    if format == "Value":
+        return f"{num_absence:,}"
+    return  f"{(num_absence*100 / filtered_df.shape[0]):.2f}%"
 
 def recived_sms_card(age_group:list = None, med_cond:list=None, area:list=None):
     filtered_df = filter_data(age_group, med_cond, area)
 
     filtered_df = filtered_df[ ~ filtered_df.Showed]
-    num_SMS = filtered_df[filtered_df.SMS_received].shape[0]
-    return num_SMS*100 / filtered_df.shape[0]
+    num_SMS = filtered_df.SMS_received.sum()
+    return f"{(num_SMS*100 / filtered_df.shape[0]):.2f}%"
 
 def avg_appoint_delay(age_group:list=None, med_cond:list = None, area:list = None):
     filtered_df = filter_data(age_group, med_cond, area)
-    return floor(filtered_df.Delay.median())
+    return f"{floor(filtered_df.Delay.median())} Days"
+
+def with_scholarship(age_group:list=None, med_cond:list=None, area:list=None):
+    filtered_df = filter_data(age_group, med_cond, area)
+
+    filtered_df = filtered_df[~filtered_df.Showed]
+    num_scholars = filtered_df.Scholarship.sum()
+    return f"{(num_scholars * 100 / filtered_df.shape[0]):.2f}%"
 
 def age_gender_dist():
     age_group = DF[~DF.Showed].groupby(["Age_group", "Gender"]).size()
@@ -95,17 +106,15 @@ def new_lead_donut(age_group:list = None, med_cond:list = None, area:list = None
 
 def medical_cond_donut(age_group:list = None, area:list = None):
     filtered_data = filter_data(age_group, area =  area)
-    cat = filtered_data[filtered_data.Hipertension].Hipertension.value_counts().reset_index(name="Count")
 
-    cat.Hipertension= cat.Hipertension.astype(str)
-    cat.iloc[0, 0] = "Hipertension"
-    cat.rename(columns={"Hipertension": "cond"}, inplace=True)
+    conditions_count = [0, 0, 0, 0]
+    conditions_count[0] = dict(cond="Hipertension", Count= filtered_data.Hipertension.sum())
+    conditions_count[1] = dict(cond="Diabetes", Count=filtered_data.Diabetes.sum())
+    conditions_count[2] = dict(cond="Alcoholism", Count=filtered_data.Alcoholism.sum())
+    conditions_count[3] = dict(cond="Handcap", Count=filtered_data.Handcap.sum())
 
-    cat.loc[1] = dict(cond="Diabetes", Count=filtered_data[filtered_data.Diabetes].Diabetes.value_counts().get(True, 0))
-    cat.loc[2] = dict(cond="Alcoholism", Count=filtered_data[filtered_data.Alcoholism].Alcoholism.value_counts().get(True, 0))
-    cat.loc[3] = dict(cond="Handcap", Count=filtered_data[filtered_data.Handcap].Handcap.value_counts().get(True, 0))
-
-    g= px.pie(cat, "cond", "Count", hole=0.3, color_discrete_sequence=["#009e73"])
+    conditions_count = pd.DataFrame(conditions_count)
+    g= px.pie(conditions_count, "cond", "Count", hole=0.3, color_discrete_sequence=["#009e73"])
     g.update_layout(dict(
         title="No-shows by Medical Condition", paper_bgcolor="rgba(0,0,0,0)", plot_bgcolor="rgba(0,0,0,0)"
     ))

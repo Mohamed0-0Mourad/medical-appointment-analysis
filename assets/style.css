@@ -7,27 +7,40 @@ html, body{
 }
 
 .card {
-    margin: 2%;
-    margin-top: 10px;
+    /*margin: 2%;*/
+    /*margin-top: 10px;*/
+    margin-bottom: 10px;
     background: #dbf2ff;
     width: 100%;
-    /* height: 165px; */
+    height: 18%;
     box-shadow: none /*0 2px 3px 0px rgba(0, 0, 0, 0.25)*/;
     border-radius: 8px;
     transition: .2s all;
     cursor: pointer;
-    align-items: center;
-    text-align: center;
+    place-content: center;
     font-size: 14px;
-    padding-top: 2px;
+}
+
+.credits_card {
+    /*margin: 2%;*/
+    /*margin-top: 10px;*/
+    margin-bottom: 10px;
+    background: #dbf2ff;
+    width: 100%;
+    box-shadow: none /*0 2px 3px 0px rgba(0, 0, 0, 0.25)*/;
+    border-radius: 8px;
+    transition: .2s all;
+    cursor: pointer;
+    place-content: center;
+    font-size: 14px;
 }
 
 
 .chart-card {
-    /*margin: 2%;*/
+    margin-bottom: 10px;
     /*margin-top: 10px;*/
     /*margin-right: 5px;*/
-    margin-inside: 10px;
+    /*margin-bottom: 20px;*/
     background: #dbf2ff;
     /*width: 100%;*/
     /* height: 165px; */
@@ -65,30 +78,23 @@ background: #dbf2ff;
 
 #controllers{
     height: 25vh;
+    place-content: center;
 }
 #age-gender-dist{
     height: 25vh;
-    padding: 0;
 }
 #new-or-lead{
     height: 35vh;
-    padding: 0;
 }
 #appoint-delay{
     height: 35vh;
-    padding: 0;
 }
 #geo-map{
     height: 40vh;
-    padding: 0;
 }
 #medical_condition{
     height:40vh;
-    padding: 0;
 }
 #appoint-gantt{
-    height: 75vh;
-    width: 100%;
-    padding: 0;
-    margin: 0;
+    height: 70vh;
 }
