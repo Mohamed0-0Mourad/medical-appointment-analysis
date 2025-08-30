@@ -1,7 +1,5 @@
 from dash import Dash, dcc, html
-from pandas import read_csv
 import charts
-from charts import avg_appoint_delay
 from preproccessing import DF
 
 def get_main_content():
@@ -15,7 +13,7 @@ def get_main_content():
 
     main_content = html.Div([
         html.Div([
-            html.H3("Medical No-Shows Analysis in Vitória - State of Espírito Santo",  className="text-left fw-bold text-nowrap", style={"color": "#e0ebde"}),
+            html.H3("Medical No-Shows Analysis in Vitória - State of Espírito Santo - Brazil",  className="text-left fw-bold text-nowrap", style={"color": "#e0ebde"}),
             html.Div([
                 html.Div([
                     html.Div([
@@ -30,7 +28,7 @@ def get_main_content():
                     ], className="row g-4"),
                     html.H6("Neighbourhood"),
                     area_filter
-                ], className="col-6 chart-card", id = "controllers"),
+                ], className="col-6 credits_card", id = "controllers"),
                 html.Div([
                     dcc.Graph(id="age-gender-dist", figure=charts.age_gender_dist(), className="chart-card"),
                 ], className="col-6"),
@@ -68,18 +66,38 @@ def get_main_content():
                         html.H6("Avg Delay", className="text-center fw-bold text-nowrap"),
                         html.Hr(style={"width": "200px", "border-top": "8px solid #009e73", "margin": "5px auto"}),
                         html.H6(className="text-center fw-bold text-nowrap", id="avg_delay")
-                    ], className="card")
+                    ], className="card"),
+                    html.Div([
+                        html.A(html.I(className="fab fa-linkedin fa-3x col"),
+                               href="https://www.linkedin.com/in/mohamed0-0mourad", target="_blank",
+                               style={"padding": "10px"}),
+                        html.A(html.I(className="fab fa-github fa-3x col"),
+                               href="https://github.com/Mohamed0-0Mourad", target="_blank",
+                               style={ "margin": "10px"}),
+                        html.A(html.I(className="fas fa-tree fa-3x col"),
+                               href="https://lnk.bio/MohamedMourad", target="_blank",
+                               style={"margin": "10px"}),
+                        html.Img(src="/assets/logo.png", id="logo")
+                    ], className="credits_card")
                 ], className="col-2 container", id = "stats-cards"),
     # --------------------- charts ----------------------------------
                 html.Div([
                     html.Div([
-                        dcc.Graph(id="appoint-delay", className="col-6 chart-card"),
-                        dcc.Graph(id="new-or-lead", className="col-6 chart-card")
+                        html.Div([
+                            dcc.Graph(id="appoint-delay", className="chart-card")
+                        ], className="col-6"),
+                        html.Div([
+                            dcc.Graph(id="new-or-lead", className="chart-card")
+                        ], className="col-6"),
                     ], className="row g-4"),
 
                     html.Div([
-                        dcc.Graph(id="geo-map", className="col-6 chart-card"),
-                        dcc.Graph(id="medical-condition", className="col-6 chart-card")
+                        html.Div([
+                            dcc.Graph(id="geo-map", className="chart-card")
+                        ], className="col-6"),
+                        html.Div([
+                            dcc.Graph(id="medical-condition", className="chart-card")
+                        ], className="col-6")
                     ], className="row g-4")
                 ], className="col-7", id = "middle-charts"),
 
@@ -90,8 +108,4 @@ def get_main_content():
 
         ], style={"background-color": ""})
     ], className="container-fluid")
-    return main_content
-
-def get_layout():
-    main_content = get_main_content()
     return main_content

@@ -1,58 +1,62 @@
 html, body{
     background-color: #627899;
+    overflow: hidden;
+}
+
+body {
+  margin: 0;
+  padding: 0;
+  height: 100vh;
+  max-height: 100vh;
+  overflow: hidden;  /* prevents infinite horizontal scroll */
 }
 
 .container {
-    margin-bottom: 5px;
+    /*margin-bottom: 5px;*/
 }
 
 .card {
-    /*margin: 2%;*/
-    /*margin-top: 10px;*/
     margin-bottom: 10px;
     background: #dbf2ff;
     width: 100%;
-    height: 18%;
+    height: 21%;
     box-shadow: none /*0 2px 3px 0px rgba(0, 0, 0, 0.25)*/;
     border-radius: 8px;
     transition: .2s all;
     cursor: pointer;
     place-content: center;
-    font-size: 14px;
+    font-size: 15px;
 }
 
 .credits_card {
-    /*margin: 2%;*/
-    /*margin-top: 10px;*/
     margin-bottom: 10px;
     background: #dbf2ff;
-    width: 100%;
+    /*width: 100%;*/
     box-shadow: none /*0 2px 3px 0px rgba(0, 0, 0, 0.25)*/;
     border-radius: 8px;
     transition: .2s all;
     cursor: pointer;
     place-content: center;
     font-size: 14px;
+    padding: 3px;
 }
 
 
 .chart-card {
     margin-bottom: 10px;
-    /*margin-top: 10px;*/
-    /*margin-right: 5px;*/
-    /*margin-bottom: 20px;*/
     background: #dbf2ff;
-    /*width: 100%;*/
-    /* height: 165px; */
-    box-shadow: 0 2px 3px 0px rgba(0, 0, 0, 0.25);
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.12);
     border-radius: 20px;
-    /*transition: .2s all;*/
-    /*cursor: pointer;*/
-    /*align-items: center;*/
-    /*text-align: center;*/
+    border: 1px solid rgba(0,0,0,0.05);
     font-size: 14px;
     padding-top: 2px;
+    transition: box-shadow 0.3s ease, transform 0.3s ease;
 }
+.chart-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.12);
+}
+
 
 .card > span {
     display: block;
@@ -61,15 +65,15 @@ html, body{
 }
 
 .container:hover .card {
-    filter: blur(3px);
-    opacity: .5;
+    /*filter: blur(3px);*/
+    opacity: .8;
     transform: scale(.98);
     box-shadow: none;
 }
 
 .container:hover .card:hover {
 transform: scale(1);
-filter: blur(0px);
+/*filter: blur(0px);*/
 opacity: 1;
 box-shadow: 0 8px 20px 0px rgba(0, 0, 0, 0.125);
 background: #dbf2ff;
@@ -77,24 +81,28 @@ background: #dbf2ff;
 }
 
 #controllers{
-    height: 25vh;
+    height: 23vh;
     place-content: center;
 }
 #age-gender-dist{
-    height: 25vh;
+    height: 23vh;
 }
 #new-or-lead{
-    height: 35vh;
+    height: 33vh;
 }
 #appoint-delay{
-    height: 35vh;
+    height: 33vh;
 }
 #geo-map{
-    height: 40vh;
+    height: 36vh;
 }
-#medical_condition{
-    height:40vh;
+#medical-condition{
+    height:36vh;
 }
 #appoint-gantt{
     height: 70vh;
+}
+#logo{
+    height: 40px;
+    place-content: center;
 }

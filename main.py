@@ -1,5 +1,5 @@
 # import charts
-from layouts.home_layout import get_layout
+from layouts.home_layout import get_main_content
 from dash import Dash
 from callbacks.update_home import register_callbacks
 import preproccessing
@@ -10,7 +10,7 @@ external_css = ["https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/css/bootstrap
 def main():
     print("Running...")
     app = Dash(__name__, external_stylesheets=external_css)
-    app.layout = get_layout()
+    app.layout = get_main_content()
     register_callbacks(app)
     app.run(debug=True)
     # charts.
